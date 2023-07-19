@@ -63,15 +63,12 @@ book: /_book.yaml
 
 1. Telink的LinuxBDT，用于擦除、烧录固件。
 
-2. 串行端口终端（比如YAT)，此Codelab中用于控制ot-cli-ftd，使用前请熟悉基本的Thread概念和OpenThread CLI。
-
-3. SSH终端（比如MobaXterm），此Codelab中用户将通过SSH终端控制Raspberry Pi。
+2. PuTTY，用于控制FTD Joiner，配置Raspberry Pi。
 
 ## 固件设置
 
 ### Telink Zephyr开发环境设置
-
-请先执行APT更新和升级，然后再执行以下步骤。
+在Linux主机上打开命令行，先执行APT更新和升级，然后再执行以下步骤。
 
 ```console
 $ sudo apt update
@@ -204,7 +201,7 @@ $ tar -vxf LinuxBDT.tar.bz2
 >
 > **Note:** 在中国大陆以外的地区下载可能会花费额外的时间。
 
-将BDT通过USB接口连接到Linux主机上，在SSH命令行输入如下指令。
+将BDT通过USB接口连接到Linux主机上，在命令行输入如下指令。
 
 ```console
 $ cd LinuxBDT
@@ -244,7 +241,7 @@ Bus 001 Device 001: ID 1d6b:0002 xHCI Host Controller
 
 <img src="img/connection_overview.jpg" alt="connection_overview.jpg" width="624.00" />
 
-在SSH命令行输入如下指令（以烧录ot-cli-ftd固件为例）
+在命令行输入如下指令（以烧录ot-cli-ftd固件为例）
 
 ```console
 $ cd ~/zephyrproject/build_ot_cli_ftd/zephyr
@@ -261,11 +258,11 @@ $ sudo ./bdt 9518 wf 0 -i bin/ot-cli-ftd.bin
  Total Time: 30087 ms
 ```
 
-ot-rcp的烧录方法和ot-cli-ftd的基本一样，不同之处在于固件名称，烧录完成后分别将两块TLSR9518开发板做好标记区分。
+ot-rcp的烧录方法和ot-cli-ftd的基本一样，不同之处在于固件名称。烧录完成后分别将两块TLSR9518开发板做好标记区分，烧录ot-cli-ftd的板子标记为FTD Joiner，烧录ot-rcp的板子标记为RCP。
 
-## 为ot-cli-ftd设备配置串口控制台
+## 为FTD Joiner设备配置串口控制台
 
-要想通过命令行功能控制ot-cli-ftd设备，请将UART连接到以下引脚：
+要想通过命令行功能控制FTD Joiner设备，请将UART连接到以下引脚：
 
 | Name  | Pin                                                    |
 | :---- | ------------------------------------------------------ |
@@ -277,7 +274,7 @@ ot-rcp的烧录方法和ot-cli-ftd的基本一样，不同之处在于固件名�
 >
 > **Note:** 波特率：115200 bits/s
 
-如图连接好设备后，打开YAT软件，新建terminal，设置串口信息后打开串口。
+如图连接好设备后，打开PuTTY，新建terminal，设置串口信息后打开串口。
 
 <img src="img/uart_console.png" alt="uart_console.png" width="624.00" />
 
@@ -289,7 +286,7 @@ OpenThread的命令行参考[OpenThread CLI Reference](https://github.com/openth
 disabled
 Done
 > ot channel
-17
+11
 Done
 >
 ```
@@ -319,7 +316,7 @@ ot-rcp固件的烧录步骤参考ot-cli-ftd烧录过程，将TLSR9518开发板�
 
 ### 安装Docker
 
-重新启动树莓派并打开一个终端窗口。
+重新启动树莓派并打开一个SSH终端窗口。
 
 1. 安装Docker
 
@@ -384,7 +381,7 @@ ot-rcp固件的烧录步骤参考ot-cli-ftd烧录过程，将TLSR9518开发板�
      $ docker run --name "otbr" --sysctl "net.ipv6.conf.all.disable_ipv6=0 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1" -p 8080:80 --dns=127.0.0.1 -it --volume /dev/ttyACM0:/dev/ttyACM0 --privileged openthread/otbr --radio-url spinel+hdlc+uart:///dev/ttyACM0
      ```
 
-5. 新开一个终端窗口，测试树莓派和RCP的连通性
+5. 新开一个SSH终端窗口，测试树莓派和RCP的连通性
 
      ```console
      $ docker exec -ti otbr sh -c "sudo ot-ctl"
@@ -418,7 +415,7 @@ ot-rcp固件的烧录步骤参考ot-cli-ftd烧录过程，将TLSR9518开发板�
      $ docker restart otbr
      ```
 
-此时，ot-cli-ftd和OTBR都已经准备好，可以进行下一步构建Thread网络。
+此时，FTD Joiner和OTBR都已经准备好，可以进行下一步构建Thread网络。
 
 ## 创建Thread网络
 
@@ -442,9 +439,9 @@ $ docker exec -ti otbr sh -c "sudo ot-ctl"
 | 6     | dataset active        | Check the complete Active Operational Dataset, please remember networkkey                                                  | Active Timestamp: 1<br/>Channel: 13<br/>Channel Mask: 0x07fff800<br/>Ext PAN ID: b07476e168eda4fc<br/>Mesh Local Prefix: fd8c:60bc:a98:c7ba::/64<br/>Network Key: c312485187484ceb5992d2343baaf93d<br/>Network Name: OpenThread-599c<br/>PAN ID: 0x599c<br/>PSKc: 04f79ad752e8401a1933486c95299f60<br/>Security Policy: 672 onrc 0<br/>Done               |
 
 OTBR在创建网络过程中随机生成的networkkey将在其他设备加入这个Thread网络时被用到。
-### ot-cli-ftd通过带外调试方式加入网络
+### FTD Joiner通过带外调试方式加入网络
 
-带外调试是指通过非无线方式（例如在OpenThread CLI中手动输入）传输网络凭据给待入网设备。在串口控制台中向ot-cli-ftd按顺序输入如下命令
+带外调试是指通过非无线方式（例如在OpenThread CLI中手动输入）传输网络凭据给待入网设备。在串口控制台中向FTD Joiner按顺序输入如下命令
 
 | Index | Command                                                  |Simple introduction                                                            | Expected Responses |
 | :---- | -------------------------------------------------------- | ----------------------------------------------------------------------------- | ------------------ |
@@ -456,7 +453,7 @@ OTBR在创建网络过程中随机生成的networkkey将在其他设备加入这
 
 > aside positive
 >
-> **Note:** ot-cli-ftd设备刚开始是child，一段时间之后会转变为router，这都是正常状态。
+> **Note:** FTD Joiner设备刚开始是child，一段时间之后会转变为router，这都是正常状态。
 ### 拓扑图
 
 在SSH终端中输入`ipaddr`、`child table`、`router table`等命令，得到如图响应
@@ -492,7 +489,7 @@ Done
 Done
 ```
 
-RLOC16为0xb000的是OTBR，ot-cli-ftd设备的RLOC16一开始是0xb001，后来获得Router ID后变成0x8400，可以看出ot-cli-ftd设备从child升级为router。
+RLOC16为0xb000的是OTBR，FTD Joiner设备的RLOC16一开始是0xb001，后来获得Router ID后变成0x8400，可以看出FTD Joiner设备从child升级为router。
 
 > aside positive
 >
@@ -521,7 +518,7 @@ fe80:0:0:0:78e3:5410:9d61:1f7e
 Done
 ```
 
-在ot-cli-ftd设备的串口控制台输入如下指令执行ping操作。
+在FTD Joiner设备的串口控制台输入如下指令执行ping操作。
 
 ```console
 > ot ping fd8c:60bc:a98:c7ba:0:ff:fe00:b000
@@ -530,11 +527,11 @@ Done
 Done
 ```
 
-串口输出的响应说明OTBR端收到了ping request，ot-cli-ftd设备收到了OTBR返回的ping response，两个设备之间通信正常。
+串口输出的响应说明OTBR端收到了ping request，FTD Joiner设备收到了OTBR返回的ping response，两个设备之间通信正常。
 
 ### UDP通信
 
-OpenThread提供的应用服务中还包括UDP，可以使用UDP API在Thread网络中的节点之间传递信息，或者通过边界路由器向外部网络传递信息。OpenThread的UDP API在[OpenThread CLI - UDP Example](https://github.com/openthread/openthread/blob/f7690fe7e9d638341921808cba6a3e695ec0131e/src/cli/README_UDP.md)中有详细介绍，此Codelab将使用其中的部分API在OTBR和ot-cli-ftd之间传输信息。
+OpenThread提供的应用服务中还包括UDP，可以使用UDP API在Thread网络中的节点之间传递信息，或者通过边界路由器向外部网络传递信息。OpenThread的UDP API在[OpenThread CLI - UDP Example](https://github.com/openthread/openthread/blob/f7690fe7e9d638341921808cba6a3e695ec0131e/src/cli/README_UDP.md)中有详细介绍，此Codelab将使用其中的部分API在OTBR和FTD Joiner之间传输信息。
 
 首先获取OTBR的Mesh-Local EID，该地址也是Thread设备的一个IPv6地址，与网络拓扑无关，可用于访问同一Thread网络分区内的Thread设备。
 
@@ -553,7 +550,7 @@ Done
 Done
 ```
 
-在串口控制台输入如下命令，启用ot-cli-ftd设备的UDP，绑定设备的1022端口，然后向OTBR发送一个5字节的`hello`信息
+在串口控制台输入如下命令，启用FTD Joiner设备的UDP，绑定设备的1022端口，然后向OTBR发送一个5字节的`hello`信息
 
 ```console
 > ot udp open 
@@ -564,7 +561,7 @@ Done
 Done
 ```
 
-SSH终端输出如下信息，OTBR收到来自ot-cli-ftd设备的`hello`信息，UDP通信成功
+SSH终端输出如下信息，OTBR收到来自FTD Joiner设备的`hello`信息，UDP通信成功
 
 ```console
 > 5 bytes from fd8c:60bc:a98:c7ba:9386:63cf:19d7:5a61 1022 hello

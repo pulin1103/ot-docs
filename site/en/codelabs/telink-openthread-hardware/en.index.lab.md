@@ -60,17 +60,15 @@ In this Codelab, you will program OpenThread on actual hardware, create and mana
 
 ### Software:
 
-1. Telink's LinuxBDT tool, for erasing and flashing firmware。
+1. Telink's LinuxBDT tool, for erasing and flashing firmware.
 
-2. Serial port terminal (such as YAT), used in this Codelab for controlling ot-cli-ftd. Please familiarize yourself with the basic concepts of Thread and OpenThread CLI before use.
-
-3. SSH terminal (such as MobaXterm), used in this Codelab for the user to control the Raspberry Pi through。
+2. PuTTY, for controlling the FTD Joiner and Raspberry Pi.
 
 ## Firmware Setup
 
 ### Setting up the Telink Zephyr Development Environment
 
-Please first execute APT updates and upgrades, then proceed with the steps below.
+On the Linux host, open the command line, first execute APT update and upgrade, and then proceed with the following steps.
 
 ```console
 $ sudo apt update
@@ -146,7 +144,7 @@ $ sudo apt upgrade
      /usr/local/zephyr-sdk[-x.y.z]
      ```
 
-     Where [-xyz] is optional text that can be any text, such as -0.16.1. The directory cannot be moved after the SDK is installed。 Then install the Zephyr toolchain：
+     Where [-xyz] is optional text that can be any text, such as -0.16.1. The directory cannot be moved after the SDK is installed. Then install the Zephyr toolchain：
 
      ```console
      $ tar xvf zephyr-sdk-0.16.1_linux-x86_64.tar.xz
@@ -176,7 +174,7 @@ $ sudo apt upgrade
 
 8. Add the Telink Zephyr remote repository：
 
-     Download the Telink repo locally as a development branch and update it。
+     Download the Telink repo locally as a development branch and update it.
 
      ```console
      $ cd ~/zephyrproject/zephyr
@@ -201,9 +199,9 @@ $ tar -vxf LinuxBDT.tar.bz2
 ```
 > aside positive
 >
-> **Note:** Downloading may take extra time outside mainland China。
+> **Note:** Downloading may take extra time outside mainland China.
 
-Connect the Burning Kit to the Linux host via the USB interface and enter the following command in the SSH command line.。
+Connect the Burning Kit to the Linux host via the USB interface and enter the following command in the command line.
 
 ```console
 $ cd LinuxBDT
@@ -243,7 +241,7 @@ Connect the TLSR9518 development kit to the Burning Kit as shown in the figure b
 
 <img src="img/connection_overview.jpg" alt="connection_overview.jpg" width="624.00" />
 
-Enter the following command in the SSH command line (taking the flashing of the ot-cli-ftd firmware as an example).
+Enter the following command in the command line (taking the flashing of the ot-cli-ftd firmware as an example).
 
 ```console
 $ cd ~/zephyrproject/build_ot_cli_ftd/zephyr
@@ -260,11 +258,11 @@ $ sudo ./bdt 9518 wf 0 -i bin/ot-cli-ftd.bin
  Total Time: 30087 ms
 ```
 
-The flashing method for ot-rcp is basically the same as ot-cli-ftd, the difference is in the firmware name. After flashing is completed, mark the two TLSR9518 development kits separately for distinction.
+The flashing method for ot-rcp is basically the same as ot-cli-ftd, the difference is in the firmware name. After flashing, distinguish the two TLSR9518 development boards by marking them accordingly. Label the board flashed with ot-cli-ftd as "FTD Joiner" and the board flashed with ot-rcp as "RCP"
 
-## Configuring a Serial Console for the ot-cli-ftd Device
+## Configuring a Serial Console for the FTD Joiner Device
 
-To control the FTD device through the command line function, connect the UART to the following pins：
+To control the FTD Joiner device through the command line function, connect the UART to the following pins：
 
 | Name  | Pin                                                    |
 | :---- | ------------------------------------------------------ |
@@ -276,7 +274,7 @@ To control the FTD device through the command line function, connect the UART to
 >
 > **Note:** Baud rate：115200 bits/s
 
-After connecting the device as shown in the figure, open the YAT software, create a new terminal, set the serial port information, and open the serial port.
+After connecting the device as shown in the figure, open PuTTY, create a new terminal, set the serial port information, and open the serial port.
 
 <img src="img/uart_console.png" alt="uart_console.png" width="624.00" />
 
@@ -288,7 +286,7 @@ Example：
 disabled
 Done
 > ot channel
-17
+11
 Done
 >
 ```
@@ -318,9 +316,9 @@ For the flashing steps of the ot-rcp firmware, refer to the flashing process of 
 
 ### Install Docker
 
-Restart Raspberry Pi and open a terminal window.
+Restart Raspberry Pi and open an SSH terminal window.
 
-1. Install Docker
+1. Install Docker:
 
      ```console
      $ curl -sSL https://get.docker.com | sh
@@ -332,13 +330,13 @@ Restart Raspberry Pi and open a terminal window.
      $ sudo usermod -aG docker $USER
      ```
 
-3. Install git
+3. Install git:
 
      ```console
      $ sudo apt install git
      ```
 
-4. If Docker has not started, start it
+4. If Docker has not started, start it:
 
      ```console
      $ sudo dockerd
@@ -354,13 +352,13 @@ Restart Raspberry Pi and open a terminal window.
 
 This Codelab pulls the OTBR Docker image directly from the [OpenThread Docker Hub](https://hub.docker.com/u/openthread/). This image has been tested and verified by the OpenThread team.
 
-1. Pull the image
+1. Pull the image:
 
      ```console
      $ docker pull openthread/otbr:latest
      ```
 
-2. View the image list in the Docker container
+2. View the image list in the Docker container:
 
      ```console
      $ docker images
@@ -368,7 +366,7 @@ This Codelab pulls the OTBR Docker image directly from the [OpenThread Docker Hu
      openthread/otbr   latest    db081f4de15f   6 days ago   766MB
      ```
 
-3. Determine the serial port name of the RCP device by checking /dev, ttyACM0 indicates that the RCP is correctly connected
+3. Determine the serial port name of the RCP device by checking /dev, ttyACM0 indicates that the RCP is correctly connected.
 
      ```console
      $ ls /dev/tty*
@@ -377,13 +375,13 @@ This Codelab pulls the OTBR Docker image directly from the [OpenThread Docker Hu
      ... 
      ```
 
-4. Run OTBR Docker for the first time, and reference the serial port of RCP (ttyACM0). If you want to continue using this OTBR Docker, use the command **docker start otbr**
+4. Run OTBR Docker for the first time, and reference the serial port of RCP (ttyACM0). If you want to continue using this OTBR Docker, use the command **docker start otbr**.
 
      ```console
      $ docker run --name "otbr" --sysctl "net.ipv6.conf.all.disable_ipv6=0 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1" -p 8080:80 --dns=127.0.0.1 -it --volume /dev/ttyACM0:/dev/ttyACM0 --privileged openthread/otbr --radio-url spinel+hdlc+uart:///dev/ttyACM0
      ```
 
-5. Open a new terminal window to test the connectivity between the Raspberry Pi and the RCP
+5. Open a new SSH terminal window to test the connectivity between the Raspberry Pi and the RCP.
 
      ```console
      $ docker exec -ti otbr sh -c "sudo ot-ctl"
@@ -393,31 +391,31 @@ This Codelab pulls the OTBR Docker image directly from the [OpenThread Docker Hu
      ```
 
 Optional
-* Get information about the running Docker container
+* Get information about the running Docker container:
 
      ```console
      $ docker ps -aq
      ```
 
-* Stop OTBR Docker
+* Stop OTBR Docker:
 
      ```console
      $ docker stop otbr
      ```
 
-* Remove OTBR Docker
+* Remove OTBR Docker:
 
      ```console
      $ docker rm otbr
      ```
 
-* Reload OTBR Docker
+* Reload OTBR Docker:
 
      ```console
      $ docker restart otbr
      ```
 
-At this point, a FTD device and an OTBR are ready, and you can proceed to the next step to build the Thread network.
+At this point, a FTD Joiner device and an OTBR are ready, and you can proceed to the next step to build the Thread network.
 
 ## Create a Thread Network
 
@@ -441,9 +439,9 @@ Then enter the commands in the order of the table, and make sure that each step 
 | 6     | dataset active        | Check the complete Active Operational Dataset, please remember networkkey                                                  | Active Timestamp: 1<br/>Channel: 13<br/>Channel Mask: 0x07fff800<br/>Ext PAN ID: b07476e168eda4fc<br/>Mesh Local Prefix: fd8c:60bc:a98:c7ba::/64<br/>Network Key: c312485187484ceb5992d2343baaf93d<br/>Network Name: OpenThread-599c<br/>PAN ID: 0x599c<br/>PSKc: 04f79ad752e8401a1933486c95299f60<br/>Security Policy: 672 onrc 0<br/>Done               |
 
 The network key randomly generated by OTBR during network creation will be used when other devices join this Thread network.
-### The ot-cli-ftd joins the network through out-of-band commissioning
+### The FTD Joiner joins the network through out-of-band commissioning
 
-Out-of-band commissioning refers to the transmission of network credentials to devices waiting to join the network through non-wireless methods (for example, manually entering in the OpenThread CLI). Enter the following commands in order in the serial console to the ot-cli-ftd.
+Out-of-band commissioning refers to the transmission of network credentials to devices waiting to join the network through non-wireless methods (for example, manually entering in the OpenThread CLI). Enter the following commands in order in the serial console to the FTD Joiner.
 
 | Index | Command                                                  |Simple introduction                                                            | Expected Responses |
 | :---- | -------------------------------------------------------- | ----------------------------------------------------------------------------- | ------------------ |
@@ -455,7 +453,7 @@ Out-of-band commissioning refers to the transmission of network credentials to d
 
 > aside positive
 >
-> **Note:** The ot-cli-ftd device starts as a child and will turn into a router after a while, which is normal.
+> **Note:** The FTD Joiner starts as a child and will turn into a router after a while, which is normal.
 ### Topology
 
 Enter commands such as `ipaddr`, `child table`, `router table` in the SSH terminal to get responses like the figure.
@@ -491,7 +489,7 @@ Done
 Done
 ```
 
-The RLOC16 of OTBR is 0xb000, the RLOC16 of the ot-cli-ftd device initially is 0xb001, and it becomes 0x8400 after obtaining the Router ID. It can be seen that the ot-cli-ftd device has been upgraded from a child to a router.
+The RLOC16 of OTBR is 0xb000, the RLOC16 of the FTD Joiner initially is 0xb001, and it becomes 0x8400 after obtaining the Router ID. It can be seen that the FTD Joiner has been upgraded from a child to a router.
 
 > aside positive
 >
@@ -520,7 +518,7 @@ fe80:0:0:0:78e3:5410:9d61:1f7e
 Done
 ```
 
-Enter the following command in the serial console of the ot-cli-ftd device to execute the ping operation.
+Enter the following command in the serial console of the FTD Joiner to execute the ping operation.
 
 ```console
 > ot ping fd8c:60bc:a98:c7ba:0:ff:fe00:b000
@@ -529,11 +527,11 @@ Enter the following command in the serial console of the ot-cli-ftd device to ex
 Done
 ```
 
-The output response of the serial port indicates that the OTBR side has received the ping request, and the ot-cli-ftd device has received the ping response returned by OTBR. The communication between the two devices is normal.
+The output response of the serial port indicates that the OTBR side has received the ping request, and the FTD Joiner has received the ping response returned by OTBR. The communication between the two devices is normal.
 
 ### UDP Communication
 
-The application services provided by OpenThread also include UDP. You can use the UDP API to pass information between nodes in the Thread network, or pass information to external networks through the Border Router. The detailed introduction of OpenThread's UDP API is in the [OpenThread CLI - UDP Example](https://github.com/openthread/openthread/blob/f7690fe7e9d638341921808cba6a3e695ec0131e/src/cli/README_UDP.md). This Codelab will use some of the APIs in it to transmit information between OTBR and ot-cli-ftd.
+The application services provided by OpenThread also include UDP. You can use the UDP API to pass information between nodes in the Thread network, or pass information to external networks through the Border Router. The detailed introduction of OpenThread's UDP API is in the [OpenThread CLI - UDP Example](https://github.com/openthread/openthread/blob/f7690fe7e9d638341921808cba6a3e695ec0131e/src/cli/README_UDP.md). This Codelab will use some of the APIs in it to transmit information between OTBR and FTD Joiner.
 
 First, get the Mesh-Local EID of OTBR. This address is also one of the IPv6 addresses of the Thread device, and it can be used to access Thread devices in the same Thread network partition.
 
@@ -552,7 +550,7 @@ Done
 Done
 ```
 
-Enter the following command in the serial console, enable the UDP of the ot-cli-ftd device, bind the device's 1022 port, and then send a 5-byte `hello` message to OTBR.
+Enter the following command in the serial console, enable the UDP of the FTD Joiner, bind the device's 1022 port, and then send a 5-byte `hello` message to OTBR.
 
 ```console
 > ot udp open 
@@ -563,7 +561,7 @@ Done
 Done
 ```
 
-The SSH terminal outputs the following information. OTBR receives the `hello` message from the ot-cli-ftd device, and the UDP communication is successful.
+The SSH terminal outputs the following information. OTBR receives the `hello` message from the FTD Joiner, and the UDP communication is successful.
 
 ```console
 > 5 bytes from fd8c:60bc:a98:c7ba:9386:63cf:19d7:5a61 1022 hello
