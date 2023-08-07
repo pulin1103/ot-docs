@@ -1,6 +1,6 @@
 ---
 id: telink-openthread-hardware
-summary: In this codelab, you'll program OpenThread on real hardware, create and manage a Thread network, and pass messages between nodes.
+summary: 在本教程中，你将在实际的硬件设备上配置出OT边界路由器，创建并管理一个Thread网络，并且在节点间传输信息。
 status: [draft]
 authors: zhenghuan zhang
 categories: Nest
@@ -22,13 +22,13 @@ Duration: 3:00
 
 <img src="img/26b7f4f6b3ea0700.png" alt="26b7f4f6b3ea0700.png" width="624.00" />
 
-[OpenThread](https://openthread.io/)是[Thread](http://threadgroup.org/)网络协议的开源实现，它是一种专为物联网（IoT)设备设计的稳健且安全的无线网状网络协议。OpenThread是由谷歌的Nest团队开发的，并作为开源项目免费提供给开发者社区使用。
+[OpenThread](https://openthread.io/)是[Thread](http://threadgroup.org/)网络协议的开源实现，它是一种专为物联网（IoT）设备设计的稳健且安全的无线网状网络协议。OpenThread是由谷歌的Nest团队开发的，并作为开源项目免费提供给开发者社区使用。
 
 [Thread规范](http://threadgroup.org/ThreadSpec)建立了一种可靠、安全且能效高的无线通信协议，适用于资源受限的设备，常见于智能家居和商业建筑。OpenThread包含了Thread的完整网络层范围，包括IPv6、6LoWPAN、带有MAC安全性的IEEE 802.15.4、网状链路建立和网状路由等功能。
 
 Telink已将OpenThread实现整合到Zephyr RTOS中，实现了与Telink硬件的无缝兼容。这个整合的源代码可以在[GitHub](https://github.com/telink-semi/zephyr)上方便地获取，并且还提供了软件开发工具包（SDK)。
 
-在这个实验中，您将在实际硬件上编程OpenThread，创建和管理一个Thread网络，并在节点之间交换信息。下图展现了实验中的硬件设置，包括一个OT边界路由器（OTBR）和一个Thread设备。
+在这个教程中，您将在实际硬件上构建OpenThread边界路由器，创建和管理一个Thread网络，并在节点之间交换信息。下图展现了教程中的硬件设置，包括一个OT边界路由器（OTBR）和一个Thread设备。
 
 <img src="img/codelab_overview.png" alt="codelab_overview.png" width="624.00" />
 
@@ -36,7 +36,7 @@ Telink已将OpenThread实现整合到Zephyr RTOS中，实现了与Telink硬件�
 
 * 使用Telink Zephyr开发环境配置OpenThread编译环境。
 
-* 构建OpenThread CLI示例（`ot-cli-ftd`和`ot-rcp`），并分别将其烧录到Telink TLSR9518开发板。
+* 构建OpenThread CLI示例（ `ot-cli-ftd` 和 `ot-rcp` ），并分别将其烧录到Telink TLSR9518开发板。
 
 * 在Raspberry Pi 3B+或更高版本上，使用Docker搭建OpenThread边界路由器（OTBR）。
 
@@ -92,23 +92,23 @@ Linux主机（Ubuntu v20.04 LTS或更高版本）充当构建机器，用于设�
 
 <img src="img/overview.png" alt="overview.png" width="624.00" />
 
-本实验将使用一块TLSR9518开发板作为RCP（无线电协处理器），使用另一个TLSR9518开发板作为FTD（全功能Thread设备）。
+本教程将使用一块TLSR9518开发板作为RCP（无线电协处理器），使用另一个TLSR9518开发板作为FTD（全功能Thread设备）。
 如果您尚未拥有这块开发板，您可以从[Telink官方网站](http://wiki.telink-semi.cn/wiki/Hardware/B91_Generic_Starter_Kit_Hardware_Guide/)获取有关TLSR9518开发套件的更多详细信息。
 需要用到的部分组件如下表所示：
 
 | 标号 | 名称                                                    |
-| :--- | -------------------------------------------------------- |
-| 1    | Telink TLSR9518开发板                                     |
-| 2    | Telink烧录板                                       |
-| 3    | 2.4Ghz天线                                                |
-| 4&5  | USB电缆（USB A 转 mini USB）                              |
-| 6    | 串口转换工具                                              |
+| :--- | ------------------------------------------------------ |
+| 1    | Telink TLSR9518开发板                                   |
+| 2    | Telink烧录板                                            |
+| 3    | 2.4GHz天线                                              |
+| 4&5  | USB电缆（USB A 转 mini USB）                            |
+| 6    | 串口转换工具                                            |
 
 > **注意：** 第六件物品不包含在出售的开发套件之中，需要自行购买。
 
 ### 安装有Raspbian操作系统镜像的树莓派3B+或更高版本
 
-在本教程中，需要使用带有[Raspbian Bullseye Lite操作系统镜像](https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2023-05-03/2023-05-03-raspios-bullseye-armhf-lite.img.xz) 或[Raspbian Bullseye桌面版镜像](https://downloads.raspberrypi.org/raspios_armhf/images/raspios_armhf-2023-05-03/2023-05-03-raspios-bullseye-armhf.img.xz)的树莓派3B+或更高版本。
+在本教程中，需要使用带有[Raspbian Bullseye Lite OS image](https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2023-05-03/2023-05-03-raspios-bullseye-armhf-lite.img.xz) 或[Raspbian Bullseye with Desktop](https://downloads.raspberrypi.org/raspios_armhf/images/raspios_armhf-2023-05-03/2023-05-03-raspios-bullseye-armhf.img.xz)的树莓派3B+或更高版本。
 它通过以太网连接到互联网，并将配置为OpenThread边界路由器（OTBR）的主机。
 
 ### 网络连接
@@ -131,6 +131,7 @@ Telink [烧录和调试工具 (BDT)](http://wiki.telink-semi.cn/wiki/IDE-and-Too
 Duration: 12:00
 
 ### Telink Zephyr开发环境设置
+
 在Linux主机上打开命令行，执行以下命令，以确保您的APT软件包管理器是最新的。
 
 ```console
@@ -169,9 +170,9 @@ $ sudo apt upgrade
      $ source ~/.bashrc
      ```
 
-     确保~/.local/bin包含在$PATH环境变量中。
+     确保 `~/.local/bin` 包含在 `$PATH` 环境变量中。
 
-3. 获取Telink Zephyr源码。
+3. 获取Zephyr项目的源码。
 
      ```console
      $ west init ~/zephyrproject
@@ -181,7 +182,7 @@ $ sudo apt upgrade
      $ west zephyr-export
      ```
 
-     在中国大陆，使用west init ~/zephyrproject和west update获取 Zephyr 源代码通常需要花费额外的时间。此外，某些项目可能无法从国外服务器更新，寻找其他方法来下载最新的源代码。
+     在中国大陆，使用 `west init ~/zephyrproject` 和 `west update` 获取 Zephyr 源代码，通常需要花费额外的时间。此外，某些项目可能无法从国外服务器更新，寻找其他方法来下载最新的源代码。
 
 4. 为 Zephyr 安装额外的 Python 依赖项。
 
@@ -189,12 +190,13 @@ $ sudo apt upgrade
      $ pip3 install --user -r ~/zephyrproject/zephyr/scripts/requirements.txt
      ```
 
-5. 设置Zephyr工具链。下载 Zephyr 工具链（大约 1~2 GB）到本地目录中，以允许您烧录固件到开发板。中国大陆境内可能需要额外时间。
+5. 设置 Zephyr 工具链。下载 Zephyr 工具链（大约 1~2 GB）到本地目录中，以允许您烧录固件到开发板。在中国大陆境内，该步骤可能需要花费额外时间。
 
      ```console
      $ wget https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.16.1/zephyr-sdk-0.16.1_linux-x86_64.tar.xz
      $ wget -O - https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.16.1/sha256.sum | shasum --check --ignore-missing
      ```
+
      下载Zephyr SDK并将其放置在推荐路径中，如下所示。
 
      ```console
@@ -207,7 +209,7 @@ $ sudo apt upgrade
      /usr/local/zephyr-sdk[-x.y.z]
      ```
 
-     其中 [-xyz] 是可选文本，可以是任何文本，例如 -0.13.2。SDK安装后不能移动该目录。接着安装Zephyr工具链。
+     其中 [-x.y.z] 可以是任何文本的可选项，例如 -0.13.2。SDK安装后不能移动该目录。接着安装Zephyr工具链。
 
      ```console
      $ tar xvf zephyr-sdk-0.16.1_linux-x86_64.tar.xz
@@ -222,9 +224,9 @@ $ sudo apt upgrade
      $ west build -p auto -b tlsr9518adk80d samples/hello_world
      ```
 
-     使用west build命令从Zephyr存储库的根目录构建hello_world示例。您可以在build/zephyr目录下找到名为zephyr.bin的固件。
+     使用west build命令从Zephyr存储库的根目录构建hello_world示例。您可以在 `build/zephyr` 目录下找到名为 `zephyr.bin` 的固件。
 
-7. 将Zephyr环境脚本添加到~/.bashrc。在bash中执行一下命令。
+7. 将Zephyr环境脚本添加到 `~/.bashrc`。在bash中执行一下命令。
 
      ```console
      $ echo "source ~/zephyrproject/zephyr/zephyr-env.sh" >> ~/.bashrc
@@ -247,7 +249,7 @@ $ sudo apt upgrade
 
 ### 泰凌LinuxBDT设置
 
-下载Telink Linux BDT烧录工具并将其解压到Linux主机的本地目录，例如~，以允许用户将固件烧录到TLSR9518开发板。
+下载Telink Linux BDT烧录工具，并将其解压到Linux主机的本地目录，例如 `~`，以允许用户将固件烧录到TLSR9518开发板。
 
 ```console
 $ cd ~
@@ -278,7 +280,7 @@ Bus 001 Device 001: ID 1d6b:0002 xHCI Host Controller
 
 编译方法如下：
 
-1. 无线电协处理器（ot-rcp)
+1. 无线电协处理器（ot-rcp）
 
      ```console
      $ cd ~/zephyrproject
@@ -296,7 +298,7 @@ Bus 001 Device 001: ID 1d6b:0002 xHCI Host Controller
 
 ### 固件烧录
 
-使用如下图所示的蓝色串口转换工具，将一块Telink TLSR9518开发板连接到Telink烧录板。
+如下图所示，使用USB连接线将一块Telink TLSR9518开发板连接到Telink烧录板。
 
 <img src="img/connection_overview.png" alt="connection_overview.png" width="624.00" />
 
@@ -317,7 +319,7 @@ $ sudo ./bdt 9518 wf 0 -i bin/ot-cli-ftd.bin
  Total Time: 30087 ms
 ```
 
-ot-rcp的烧录方法和ot-cli-ftd的基本一样，不同之处在于固件名称。烧录完成后分别将两块TLSR9518开发板做好标记区分，烧录ot-cli-ftd的开发板标记为FTD Joiner，烧录ot-rcp的开发板标记为RCP。
+ot-rcp的烧录方法和ot-cli-ftd的基本一样，不同之处在于固件名称。烧录完成后分别将两块TLSR9518开发板做好标记区分，烧录ot-cli-ftd的开发板标记为“FTD Joiner”，烧录ot-rcp的开发板标记为“RCP”。
 
 ## 为FTD Joiner设备配置串口控制台
 
@@ -339,7 +341,7 @@ Duration: 3:00
 
 <img src="img/uart_console.png" alt="uart_console.png" width="624.00" />
 
- OpenThread的命令行参考[OpenThread CLI Reference](https://github.com/openthread/openthread/blob/f7690fe7e9d638341921808cba6a3e695ec0131e/src/cli/README.md), 使用的时候务必加上`ot`前缀。  
+ OpenThread的命令行参考[OpenThread CLI Reference](https://github.com/openthread/openthread/blob/f7690fe7e9d638341921808cba6a3e695ec0131e/src/cli/README.md), 使用所有命令的时候，务必加上`ot`前缀。  
 
 例子：
 
@@ -357,11 +359,11 @@ Done
 
 Duration: 9:00
 
-OpenThread Border Router是由两个主要部分组成的设备：
+OpenThread Border Router是由两个主要部件所组成的设备：
 
 * **Raspberry Pi** 包含充当边界路由器（BR）所需的所有服务和固件。
 
-* **RCP** 负责Thread通信。
+* **RCP** 负责Thread的射频通信。
 
 ### 无线电协处理器（RCP）
 
@@ -430,7 +432,7 @@ ot-rcp固件的烧录步骤参考ot-cli-ftd烧录过程，将TLSR9518开发板�
      openthread/otbr   latest    db081f4de15f   6 days ago   766MB
      ```
 
-3. 通过检查/dev确定RCP设备的串行端口名称, 出现ttyACM0表示RCP正确连接。
+3. 通过检查 `/dev` 确定RCP设备的串行端口名称, 出现 `ttyACM0` 表示RCP正确连接。
 
      ```console
      $ ls /dev/tty*
@@ -439,7 +441,7 @@ ot-rcp固件的烧录步骤参考ot-cli-ftd烧录过程，将TLSR9518开发板�
      ... 
      ```
 
-4. 第一次运行OTBR Docker, 并引用RCP的串行端口（ttyACM0），此后若要继续使用该OTBR Docker，请使用命令**docker start otbr**。
+4. 第一次运行OTBR Docker, 并引用RCP的串行端口（ttyACM0），此后若要继续使用该OTBR Docker，请使用命令 **docker start otbr**。
 
      ```console
      $ docker run --name "otbr" --sysctl "net.ipv6.conf.all.disable_ipv6=0 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1" -p 8080:80 --dns=127.0.0.1 -it --volume /dev/ttyACM0:/dev/ttyACM0 --privileged openthread/otbr --radio-url spinel+hdlc+uart:///dev/ttyACM0
@@ -488,7 +490,7 @@ Duration: 6:00
 
 ### 在RCP上创建一个Thread网络
 
-我们在OTBR上使用**ot-ctl** shell来建立Thread网络。如果您在上一节退出了shell，在SSH终端中输入以下命令来重新启动它：
+我们在OTBR上使用 **ot-ctl** shell 来建立Thread网络。如果您在上一节退出了shell，在SSH终端中输入以下命令来重新启动它：
 
 ```console
 $ docker exec -ti otbr sh -c "sudo ot-ctl"
@@ -506,11 +508,11 @@ $ docker exec -ti otbr sh -c "sudo ot-ctl"
 | 5     | `state`                 | 检查设备状态。可以多次调用此命令，直到设备成为Leader并继续进行下一步操作。                                                    | leader<br/>Done               |
 | 6     | `dataset active`        | 检查完整的活动运行数据集，并记住网络密钥。                                                  | Active Timestamp: 1<br/>Channel: 13<br/>Channel Mask: 0x07fff800<br/>Ext PAN ID: b07476e168eda4fc<br/>Mesh Local Prefix: fd8c:60bc:a98:c7ba::/64<br/>Network Key: c312485187484ceb5992d2343baaf93d<br/>Network Name: OpenThread-599c<br/>PAN ID: 0x599c<br/>PSKc: 04f79ad752e8401a1933486c95299f60<br/>Security Policy: 672 onrc 0<br/>Done               |
 
-OTBR在创建网络过程中随机生成的networkkey将在FTD Joiner加入这个Thread网络时被用到。
+OTBR在创建网络过程中随机生成的 `networkkey` 将在 FTD Joiner 加入这个Thread网络时被用到。
 
 ### FTD Joiner通过带外调试方式加入网络
 
-带外调试是指通过非无线方式（例如在OpenThread CLI中手动输入）传输网络凭据给待入网设备。在串口控制台中向FTD Joiner按顺序输入如下命令。
+带外调试是指通过非无线方式（例如在OpenThread CLI中手动输入）传输网络凭据给待入网设备。在串口控制台中，向FTD Joiner按顺序输入如下命令。
 
 | 序号  | 命令                                                       |命令简介                                                            | 预期响应 |
 | :---- | --------------------------------------------------------   | ----------------------------------------------------------------------------- | ------------------ |
@@ -524,9 +526,10 @@ OTBR在创建网络过程中随机生成的networkkey将在FTD Joiner加入这�
 > aside positive
 >
 > **注意：** FTD Joiner设备刚开始是child，一段时间之后会转变为router，这都是正常状态。
+
 ### 拓扑图
 
-在SSH终端中输入`ipaddr`、`child table`、`router table`等命令，得到如图响应。
+在SSH终端中输入 `ipaddr`、`child table`、`router table` 等命令，得到如下响应。
 
 ```console
 > ipaddr rloc
@@ -559,11 +562,11 @@ Done
 Done
 ```
 
-OTBR的`RLOC16`是`0xb000`，而FTD Joiner最初的`RLOC16`是`0xb001`。然后，在获得路由器ID后，FTD Joiner的`RLOC16`变成了`0x8400`。可以看出FTD Joiner设备从child升级为router。
+OTBR的 `RLOC16` 是 `0xb000`，而FTD Joiner最初的 `RLOC16` 是 `0xb001`。然后，在获得路由器ID后，FTD Joiner的 `RLOC16` 变成了 `0x8400`。可以看出FTD Joiner设备从child升级为router。
 
 > aside positive
 >
-> **Note:** RLOC全称是Routing Locator，根据Thread设备在网络拓扑中的位置来标识该设备，是Thread设备的几个IPv6地址之一，具体介绍查阅[IPv6 Addressing](https://openthread.io/guides/thread-primer/ipv6-addressing#routing-locator-rloc)。
+> **Note:** RLOC 全称是 Routing Locator，根据Thread设备在网络拓扑中的位置来标识该设备，是Thread设备的几个IPv6地址之一，具体介绍查阅[IPv6 Addressing](https://openthread.io/guides/thread-primer/ipv6-addressing#routing-locator-rloc)。
 
 现在的Thread网络包含两个节点，拓扑如下图所示。
 
@@ -575,7 +578,7 @@ Duration: 6:00
 
 ### ICMPv6通信
 
-我们使用`ping`命令来检查同一网络的Thread设备能否相互通信。先用`ipaddr`命令获取设备的RLOC。
+我们使用 `ping` 命令来检查同一网络的Thread设备能否相互通信。先用 `ipaddr` 命令获取设备的RLOC。
 
 ```console
 > ipaddr
@@ -603,7 +606,7 @@ Done
 
 ### UDP通信
 
-OpenThread提供的应用服务中还包括UDP，可以使用UDP API在Thread网络中的节点之间传递信息，或者通过边界路由器向外部网络传递信息。OpenThread的UDP API在[OpenThread CLI - UDP Example](https://github.com/openthread/openthread/blob/f7690fe7e9d638341921808cba6a3e695ec0131e/src/cli/README_UDP.md)中有详细介绍，此codelab将使用其中的部分API在OTBR和FTD Joiner之间传输信息。
+OpenThread提供的应用服务中还包括UDP，可以使用UDP API在Thread网络中的节点之间传递信息，或者通过边界路由器向外部网络传递信息。OpenThread的UDP API在[OpenThread CLI - UDP Example](https://github.com/openthread/openthread/blob/f7690fe7e9d638341921808cba6a3e695ec0131e/src/cli/README_UDP.md)中有详细介绍，此教程将使用其中的部分API在OTBR和FTD Joiner之间传输信息。
 
 首先获取OTBR的Mesh-Local EID，该地址也是Thread设备的一个IPv6地址，与网络拓扑无关，可用于访问同一Thread网络分区内的Thread设备。
 
@@ -646,7 +649,7 @@ SSH终端输出如下信息，OTBR收到来自FTD Joiner设备的`hello`信息�
 您现在已经知道：
 
 * 如何搭建并使用Telink Zephyr开发环境。
-* 如何构建`ot-cli-ftd`和`ot-rcp`两种二进制文件并将其烧录到TLSR9518开发板。
+* 如何构建 `ot-cli-ftd` 和 `ot-rcp` 两种二进制文件并将其烧录到TLSR9518开发板。
 * 如何使用Docker将Raspberry Pi 3B+ 或更高版本设置为OpenThread边界路由器（OTBR）。
 * 如何在OTBR上创建Thread网络。
 * 通过带外调试方式将设备添加到Thread网络。
@@ -656,18 +659,18 @@ SSH终端输出如下信息，OTBR收到来自FTD Joiner设备的`hello`信息�
 
 查看[openthread.io](https://openthread.io/)和[GitHub](https://github.com/openthread)，了解各种OpenThread资源，包括：
 
-*  [Supported Platforms](https://openthread.io/platforms/)
+* [Supported Platforms](https://openthread.io/platforms/)
     — discover all the platforms that support OpenThread
-*  [Build OpenThread](../../guides/build/index.md)
+* [Build OpenThread](../../guides/build/index.md)
     — further details on building and configuring OpenThread
-*  [Thread Primer](../../guides/thread-primer/index.md)
+* [Thread Primer](../../guides/thread-primer/index.md)
     — covers all the Thread concepts featured in this codelab
 
 参考文档:
 
-*  [OpenThread CLI reference](https://github.com/openthread/openthread/blob/main/src/cli/README.md)
-*  [OpenThread UDP CLI reference](https://github.com/openthread/openthread/blob/main/src/cli/README_UDP.md)
-*  [OpenThread UDP API reference](https://openthread.io/reference/group/api-udp)
+* [OpenThread CLI reference](https://github.com/openthread/openthread/blob/main/src/cli/README.md)
+* [OpenThread UDP CLI reference](https://github.com/openthread/openthread/blob/main/src/cli/README_UDP.md)
+* [OpenThread UDP API reference](https://openthread.io/reference/group/api-udp)
 
 ## License
 
@@ -697,5 +700,3 @@ INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
 CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
-
-
