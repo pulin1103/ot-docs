@@ -12,7 +12,7 @@ layout: scrolling
 
 ---
 
-# 使用TLSR9518开发板和OpenThread构建Thread网络
+# 使用B91开发板和OpenThread构建Thread网络
 
 [Codelab Feedback](https://github.com/openthread/ot-docs/issues)
 
@@ -36,7 +36,7 @@ Telink已将OpenThread实现整合到Zephyr RTOS中，实现了与Telink硬件�
 
 * 使用Telink Zephyr开发环境配置OpenThread编译环境。
 
-* 构建OpenThread CLI示例（ `ot-cli-ftd` 和 `ot-rcp` ），并分别将其烧录到Telink TLSR9518开发板。
+* 构建OpenThread CLI示例（ `ot-cli-ftd` 和 `ot-rcp` ），并分别将其烧录到Telink B91开发板。
 
 * 在Raspberry Pi 3B+或更高版本上，使用Docker搭建OpenThread边界路由器（OTBR）。
 
@@ -50,13 +50,11 @@ Telink已将OpenThread实现整合到Zephyr RTOS中，实现了与Telink硬件�
 
 硬件：
 
-* 2块TLSR9518开发板。
+* 2块B91开发板。
 
 * 1台Raspberry Pi 3B+或更高版本，并安装Raspbian操作系统映像。
 
 * 1台Linux主机，至少带有两个USB端口。
-
-* 1个USB到TTL串口转换工具。
 
 * 1个已连接互联网的交换机（或路由器）和若干条以太网电缆。
 
@@ -82,29 +80,26 @@ Linux主机（Ubuntu v20.04 LTS或更高版本）充当构建机器，用于设�
 
 ### 串口连接和串口终端工具
 
-建议您熟悉如何使用串口转换工具在设备之间建立连接。此外，您将需要一个串口终端工具来访问这些设备。
+您可以直接将设备插入Linux主机的USB端口。此外，您将需要一个串口终端工具来访问这些设备。
 
 在本教程中，终端工具PuTTY用于控制FTD Joiner和Raspberry Pi，也可以使用其他终端软件。
 
-### Telink TLSR9518开发套件
+### Telink B91开发套件
 
-本教程需要2块TLSR9518开发板。
+本教程需要2块B91开发板。下面的图片展示了一个套件中所需的最少组件。
 
 <img src="img/overview.png" alt="overview.png" width="624.00" />
 
-本教程将使用一块TLSR9518开发板作为RCP（无线电协处理器），使用另一个TLSR9518开发板作为FTD（全功能Thread设备）。
-如果您尚未拥有这块开发板，您可以从[Telink官方网站](http://wiki.telink-semi.cn/wiki/Hardware/B91_Generic_Starter_Kit_Hardware_Guide/)获取有关TLSR9518开发套件的更多详细信息。
+本教程将使用一块B91开发板作为RCP（无线电协处理器），使用另一个B91开发板作为FTD（全功能Thread设备）。
+如果您尚未拥有这块开发板，您可以从[Telink官方网站](http://wiki.telink-semi.cn/wiki/Hardware/B91_Generic_Starter_Kit_Hardware_Guide/)获取有关B91开发套件的更多详细信息。
 需要用到的部分组件如下表所示：
 
 | 标号 | 名称                                                    |
 | :--- | ------------------------------------------------------ |
-| 1    | Telink TLSR9518开发板                                   |
+| 1    | Telink B91开发板                                   |
 | 2    | Telink烧录板                                            |
 | 3    | 2.4GHz天线                                              |
-| 4&5  | USB电缆（USB A 转 mini USB）                            |
-| 6    | 串口转换工具                                            |
-
-> **注意：** 第六件物品不包含在出售的开发套件之中，需要自行购买。
+| 4    | USB电缆（USB A 转 mini USB）                            |
 
 ### 安装有Raspbian操作系统镜像的树莓派3B+或更高版本
 
@@ -118,7 +113,7 @@ Linux主机（Ubuntu v20.04 LTS或更高版本）充当构建机器，用于设�
 
 ### LinuxBDT
 
-Telink [烧录和调试工具 (BDT)](http://wiki.telink-semi.cn/wiki/IDE-and-Tools/Burning-and-Debugging-Tools-for-all-Series/) 适用于所有Telink芯片系列，可用于擦除和烧录OpenThread固件到Telink TLSR9518开发套件上。
+Telink [烧录和调试工具 (BDT)](http://wiki.telink-semi.cn/wiki/IDE-and-Tools/Burning-and-Debugging-Tools-for-all-Series/) 适用于所有Telink芯片系列，可用于擦除和烧录OpenThread固件到Telink B91开发套件上。
 在您的Linux主机上安装基于X86架构的[LinuxBDT](http://wiki.telink-semi.cn/tools_and_sdk/Tools/BDT/LinuxBDT.tar.bz2)。
 
 ### 其他
@@ -249,7 +244,7 @@ $ sudo apt upgrade
 
 ### 泰凌LinuxBDT设置
 
-下载Telink Linux BDT烧录工具，并将其解压到Linux主机的本地目录，例如 `~`，以允许用户将固件烧录到TLSR9518开发板。
+下载Telink Linux BDT烧录工具，并将其解压到Linux主机的本地目录，例如 `~`，以允许用户将固件烧录到B91开发板。
 
 ```console
 $ cd ~
@@ -298,7 +293,7 @@ Bus 001 Device 001: ID 1d6b:0002 xHCI Host Controller
 
 ### 固件烧录
 
-如下图所示，使用USB连接线将一块Telink TLSR9518开发板连接到Telink烧录板。
+如下图所示，使用USB连接线将一块Telink B91开发板连接到Telink烧录板。
 
 <img src="img/connection_overview.png" alt="connection_overview.png" width="624.00" />
 
@@ -319,25 +314,17 @@ $ sudo ./bdt 9518 wf 0 -i bin/ot-cli-ftd.bin
  Total Time: 30087 ms
 ```
 
-ot-rcp的烧录方法和ot-cli-ftd的基本一样，不同之处在于固件名称。烧录完成后分别将两块TLSR9518开发板做好标记区分，烧录ot-cli-ftd的开发板标记为“FTD Joiner”，烧录ot-rcp的开发板标记为“RCP”。
+ot-rcp的烧录方法和ot-cli-ftd的基本一样，不同之处在于固件名称。烧录完成后分别将两块B91开发板做好标记区分，烧录ot-cli-ftd的开发板标记为“FTD Joiner”，烧录ot-rcp的开发板标记为“RCP”。
 
 ## 为FTD Joiner设备配置串口控制台
 
 Duration: 3:00
 
-要想通过命令行功能控制FTD Joiner设备，将串口转换工具连接到TLSR9518开发板上的以下引脚：
+如图所示，直接将FTD Joiner插入计算机的USB端口。
 
-| 名称  | 引脚                                                    |
-| :---- | ------------------------------------------------------ |
-| RX    | PB3 (pin 15 of J34)                                    |
-| TX    | PB2 (pin 18 of J34)                                    |
-| GND   | GND (pin 23 of J50)                                    |
+<img src="img/usb_connection.png" alt="usb_connection.png" width="624.00" />
 
-> aside positive
->
-> **注意：** 波特率：115200 bits/s
-
-如图连接好设备后，打开PuTTY，新建terminal，设置串口信息后打开串口。
+将FTD Joiner设备连接到Linux主机后，打开PuTTY，新建terminal，设置串口信息后打开串口。
 
 <img src="img/uart_console.png" alt="uart_console.png" width="624.00" />
 
@@ -367,13 +354,13 @@ OpenThread Border Router是由两个主要部件所组成的设备：
 
 ### 无线电协处理器（RCP）
 
-ot-rcp固件的烧录步骤参考ot-cli-ftd烧录过程，将TLSR9518开发板连接到树莓派的USB端口上，连接方式如下图所示。
+ot-rcp固件的烧录步骤参考ot-cli-ftd烧录过程，将B91开发板连接到树莓派的USB端口上，连接方式如下图所示。
 
 <img src="img/OTBR_overview.png" alt="OTBR_overview.png" width="624.00" />
 
 ### 树莓派
 
-1. 确保写入SD卡中的是[Raspbian Bullseye Lite操作系统镜像](https://downloads.Raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2023-05-03/2023-05-03-raspios-bullseye-armhf-lite.img.xz)或[Raspbian Bullseye桌面版镜像](https://downloads.Raspberrypi.org/raspios_armhf/images/raspios_armhf-2023-05-03/2023-05-03-raspios-bullseye-armhf.img.xz)
+1. 确保写入SD卡中的是[Raspbian Bullseye Lite OS image](https://downloads.Raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2023-05-03/2023-05-03-raspios-bullseye-armhf-lite.img.xz)或[Raspbian Bullseye with Desktop](https://downloads.Raspberrypi.org/raspios_armhf/images/raspios_armhf-2023-05-03/2023-05-03-raspios-bullseye-armhf.img.xz)
 
 2. 您可以选择通过SSH连接到树莓派，也可以直接在Raspbian桌面上操作。本教程将使用SSH。
 
@@ -649,7 +636,7 @@ SSH终端输出如下信息，OTBR收到来自FTD Joiner设备的`hello`信息�
 您现在已经知道：
 
 * 如何搭建并使用Telink Zephyr开发环境。
-* 如何构建 `ot-cli-ftd` 和 `ot-rcp` 两种二进制文件并将其烧录到TLSR9518开发板。
+* 如何构建 `ot-cli-ftd` 和 `ot-rcp` 两种二进制文件并将其烧录到B91开发板。
 * 如何使用Docker将Raspberry Pi 3B+ 或更高版本设置为OpenThread边界路由器（OTBR）。
 * 如何在OTBR上创建Thread网络。
 * 通过带外调试方式将设备添加到Thread网络。
