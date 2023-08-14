@@ -26,9 +26,8 @@ layout: scrolling
 
 Telink已将OpenThread实现整合到Zephyr RTOS中，实现了与Telink硬件的无缝兼容。这个整合的源代码可以在[GitHub](https://github.com/telink-semi/zephyr)上方便地获取，并且还提供了软件开发工具包（SDK)。
 
-在这个教程中，您将在Telink Zephyr开发环境上构建OpenThread NCP和RCP固件，使用这两种固件分别与树莓派协同工作，创建和管理一个Thread网络。下图展现了教程中的硬件设置，包括一个树莓派、一个OpenThread NCP和一个OpenThread RCP。
+在这个教程中，您将在Telink Zephyr开发环境上构建OpenThread NCP和RCP固件，使用这两种固件分别与树莓派协同工作，创建和管理Thread网络。其中，所需要的硬件，包括一个树莓派用作OT边界路由器并运行 `Pyspinel`、一个B91开发板用作OpenThread NCP，另一个B91开发板用作OpenThread RCP。
 
-<img src="img/codelab_overview.png" alt="codelab_overview.png" width="624.00" />
 
 ### 学习内容
 
@@ -267,7 +266,7 @@ Bus 001 Device 001: ID 1d6b:0002 xHCI Host Controller
 
 2. 网络协处理器（ot-ncp-ftd）
 
-     打开位于zephyr/samples/net/openthread/coprocessor/overlay-rcp-usb-telink.conf 文件，按如下示范进行修改。
+     打开位于 `zephyr/samples/net/openthread/coprocessor/overlay-rcp-usb-telink.conf` 文件，按如下示范进行修改。
 
      ```console
      # Telink RCP USB-CDC-ACM
@@ -278,13 +277,13 @@ Bus 001 Device 001: ID 1d6b:0002 xHCI Host Controller
      CONFIG_USB_DEVICE_PRODUCT="OpenThread CoProcessor NCP"
      ```
 
-     完成后打开位于zephyr/samples/net/openthread/coprocessor/boards/tlsr9518adk80d.conf文件，按如下示范进行修改。
+     完成后打开位于 `zephyr/samples/net/openthread/coprocessor/boards/tlsr9518adk80d.conf` 文件，按如下示范进行修改。
 
      ```console
      CONFIG_OPENTHREAD_NUM_MESSAGE_BUFFERS=256
      ```
 
-     然后执行以下命令编译ot-ncp-ftd固件。
+     然后执行以下命令编译 `ot-ncp-ftd` 固件。
 
      ```console
      $ cd ~/zephyrproject
@@ -315,7 +314,7 @@ $ sudo ./bdt 9518 wf 0 -i bin/ot-ncp-ftd.bin
  Total Time: 30087 ms
 ```
 
-ot-rcp的烧录方法和ot-ncp-ftd的基本一样，不同之处在于固件名称。烧录完成后分别将两块B91开发板做好标记区分，烧录ot-ncp-ftd的开发板标记为“NCP”，烧录ot-rcp的开发板标记为“RCP”。
+ot-rcp 的烧录方法和 ot-ncp-ftd 的基本一样，不同之处在于固件名称。烧录完成后分别将两块B91开发板做好标记区分，烧录 ot-ncp-ftd 的开发板标记为“NCP”，烧录 ot-rcp 的开发板标记为“RCP”。
 
 ## 固件应用
 
@@ -331,14 +330,20 @@ ot-rcp的烧录方法和ot-ncp-ftd的基本一样，不同之处在于固件名�
 
 2. 您可以选择通过SSH连接到树莓派，也可以直接在Raspbian桌面上操作。本教程将使用SSH。
 
-3. 在下一步安装OTBR Docker之前，先更新本地代码库和软件包管理器。
+3. 在下一步安装OTBR Docker或Pyspinel之前，先更新本地代码库和软件包管理器。
 
      ```console
      $ sudo apt-get update
      $ sudp apt-get upgrade
      ```
 
-### 安装Docker
+### 无线电协处理器（RCP）
+
+ot-rcp固件的烧录步骤参考ot-ncp-ftd烧录过程，将B91开发板连接到树莓派的USB端口上，连接方式如下图所示。
+
+<img src="img/OTBR_overview.png" alt="OTBR_overview.png" width="624.00" />
+
+#### 安装Docker
 
 重新启动树莓派并打开一个SSH终端窗口。
 
@@ -368,13 +373,7 @@ ot-rcp的烧录方法和ot-ncp-ftd的基本一样，不同之处在于固件名�
      $ sudo modprobe ip6table_filter
      ```
 
-### 无线电协处理器（RCP）
-
-ot-rcp固件的烧录步骤参考ot-ncp-ftd烧录过程，将B91开发板连接到树莓派的USB端口上，连接方式如下图所示。
-
-<img src="img/OTBR_overview.png" alt="OTBR_overview.png" width="624.00" />
-
-### 配置并运行Docker
+#### 配置并运行Docker
 
 本教程直接从[OpenThread Docker Hub](https://hub.docker.com/u/openthread/)拉取OTBR Docker镜像，该镜像已经过OpenThread团队的测试和验证。
 
@@ -456,11 +455,11 @@ ot-rcp固件的烧录步骤参考ot-ncp-ftd烧录过程，将B91开发板连接�
 
 ### 网络协处理器（NCP）
 
-重启树莓派，拔掉RCP，将NCP连接到树莓派的USB端口上，连接方式如下图。
+关闭树莓派，拔掉RCP。将NCP连接到树莓派的USB端口上，再重新启动树莓派。连接方式如下图。
 
 <img src="img/NCP_overview.png" alt="NCP_overview.png" width="624.00" />
 
-### 安装Pyspinel
+#### 安装Pyspinel
 
 在树莓派上打开一个新的SSH终端窗口。
 
@@ -471,7 +470,7 @@ ot-rcp固件的烧录步骤参考ot-ncp-ftd烧录过程，将B91开发板连接�
      $ pip3 install --user pyserial ipaddress
      ```
 
-2. 下载pyspinel repo到本地：
+2. 下载 `pyspinel` 的源码到本地：
 
      ```console
      $ git clone https://github.com/openthread/pyspinel
@@ -484,7 +483,7 @@ ot-rcp固件的烧录步骤参考ot-ncp-ftd烧录过程，将B91开发板连接�
      $ sudo python3 setup.py install
      ```
 
-### 验证NCP功能
+#### 验证NCP功能
 
 1. 配置NCP连接。
 
@@ -521,6 +520,7 @@ ot-rcp固件的烧录步骤参考ot-ncp-ftd烧录过程，将B91开发板连接�
      leader
      Done
      ```
+
      可以看到NCP已成为leader，Thread网络被成功创建。
 
 可选用的spinel-cli命令：
@@ -559,7 +559,6 @@ ot-rcp固件的烧录步骤参考ot-ncp-ftd烧录过程，将B91开发板连接�
 * 在Raspberry Pi 3B+或更高版本上，使用 `Pyspinel` 验证NCP功能。
 
 RCP和NCP方案都可以实现OTBR的功能，从目前的社区的支持力度看，RCP更适合用于OTBR的开发。
-
 
 ### 深入阅读
 
