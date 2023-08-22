@@ -1,14 +1,3 @@
----
-summary: 在本教程中，你将在实际的硬件设备上配置出OT边界路由器，一个RCP和一个NCP，创建并管理一个Thread网络，并且在节点间传输信息。
-status: [draft]
-authors: zhenghuan zhang，Damien Ji
-categories: Nest
-tags: web
-project: /_project.yaml
-book: /_book.yaml
-layout: scrolling
-
----
 
 # 泰凌微电子Thread RCP和NCP方案介绍
 
@@ -110,109 +99,109 @@ $ sudo apt upgrade
 
 1. 安装依赖项。
 
-     ```console
-     $ wget https://apt.kitware.com/kitware-archive.sh
-     $ sudo bash kitware-archive.sh
-     $ sudo apt install --no-install-recommends git cmake ninja-build gperf \
-     ccache dfu-util device-tree-compiler \
-     python3-dev python3-pip python3-setuptools python3-tk python3-wheel xz-utils file \
-     make gcc gcc-multilib g++-multilib libsdl2-dev
-     ```
+```console
+$ wget https://apt.kitware.com/kitware-archive.sh
+$ sudo bash kitware-archive.sh
+$ sudo apt install --no-install-recommends git cmake ninja-build gperf \
+ccache dfu-util device-tree-compiler \
+python3-dev python3-pip python3-setuptools python3-tk python3-wheel xz-utils file \
+make gcc gcc-multilib g++-multilib libsdl2-dev
+```
 
-     Zephyr目前需要主要依赖项的最低版本，例如 CMake (3.20.0)、Python3 (3.6)、Devicetree 编译器 (1.4.6)。
+Zephyr目前需要主要依赖项的最低版本，例如 CMake (3.20.0)、Python3 (3.6)、Devicetree 编译器 (1.4.6)。
 
-     ```console
-     $ cmake --version
-     $ python3 --version
-     $ dtc --version
-     ```
+```console
+$ cmake --version
+$ python3 --version
+$ dtc --version
+```
 
-     在执行后续步骤之前，验证系统上安装的版本。如果版本不对，将 APT 镜像切换到稳定且最新的镜像，或手动更新这些依赖项。
+在执行后续步骤之前，验证系统上安装的版本。如果版本不对，将 APT 镜像切换到稳定且最新的镜像，或手动更新这些依赖项。
 
 2. 安装west。
 
-     ```console
-     $ pip3 install --user -U west
-     $ echo 'export PATH=~/.local/bin:"$PATH"' >> ~/.bashrc
-     $ source ~/.bashrc
-     ```
+```console
+$ pip3 install --user -U west
+$ echo 'export PATH=~/.local/bin:"$PATH"' >> ~/.bashrc
+$ source ~/.bashrc
+```
 
-     确保 `~/.local/bin` 包含在 `$PATH` 环境变量中。
+确保 `~/.local/bin` 包含在 `$PATH` 环境变量中。
 
 3. 获取Zephyr项目的源码。
 
-     ```console
-     $ west init ~/zephyrproject
-     $ cd ~/zephyrproject
-     $ west update
-     $ west blobs fetch hal_telink
-     $ west zephyr-export
-     ```
+```console
+$ west init ~/zephyrproject
+$ cd ~/zephyrproject
+$ west update
+$ west blobs fetch hal_telink
+$ west zephyr-export
+```
 
-     在中国大陆，使用 `west init ~/zephyrproject` 和 `west update` 获取 Zephyr 源代码，通常需要花费额外的时间。此外，某些项目可能无法从国外服务器更新，寻找其他方法来下载最新的源代码。
+在中国大陆，使用 `west init ~/zephyrproject` 和 `west update` 获取 Zephyr 源代码，通常需要花费额外的时间。此外，某些项目可能无法从国外服务器更新，寻找其他方法来下载最新的源代码。
 
 4. 为 Zephyr 安装额外的 Python 依赖项。
 
-     ```console
-     $ pip3 install --user -r ~/zephyrproject/zephyr/scripts/requirements.txt
-     ```
+```console
+$ pip3 install --user -r ~/zephyrproject/zephyr/scripts/requirements.txt
+```
 
 5. 设置 Zephyr 工具链。下载 Zephyr 工具链（大约 1~2 GB）到本地目录中，以允许您烧录固件到开发板。在中国大陆境内，该步骤可能需要花费额外时间。
 
-     ```console
-     $ wget https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.16.1/zephyr-sdk-0.16.1_linux-x86_64.tar.xz
-     $ wget -O - https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.16.1/sha256.sum | shasum --check --ignore-missing
-     ```
+```console
+$ wget https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.16.1/zephyr-sdk-0.16.1_linux-x86_64.tar.xz
+$ wget -O - https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.16.1/sha256.sum | shasum --check --ignore-missing
+```
 
-     下载Zephyr SDK并将其放置在推荐路径中，如下所示。
+下载Zephyr SDK并将其放置在推荐路径中，如下所示。
 
-     ```console
-     $HOME/zephyr-sdk[-x.y.z]
-     $HOME/.local/zephyr-sdk[-x.y.z]
-     $HOME/.local/opt/zephyr-sdk[-x.y.z]
-     $HOME/bin/zephyr-sdk[-x.y.z]
-     /opt/zephyr-sdk[-x.y.z]
-     /usr/zephyr-sdk[-x.y.z]
-     /usr/local/zephyr-sdk[-x.y.z]
-     ```
+```console
+$HOME/zephyr-sdk[-x.y.z]
+$HOME/.local/zephyr-sdk[-x.y.z]
+$HOME/.local/opt/zephyr-sdk[-x.y.z]
+$HOME/bin/zephyr-sdk[-x.y.z]
+/opt/zephyr-sdk[-x.y.z]
+/usr/zephyr-sdk[-x.y.z]
+/usr/local/zephyr-sdk[-x.y.z]
+```
 
-     其中 [-x.y.z] 可以是任何文本的可选项，例如 -0.13.2。SDK安装后不能移动该目录。接着安装Zephyr工具链。
+其中 [-x.y.z] 可以是任何文本的可选项，例如 -0.13.2。SDK安装后不能移动该目录。接着安装Zephyr工具链。
 
-     ```console
-     $ tar xvf zephyr-sdk-0.16.1_linux-x86_64.tar.xz
-     $ cd zephyr-sdk-0.16.1
-     $ ./setup.sh -t riscv64-zephyr-elf -h -c
-     ```
+```console
+$ tar xvf zephyr-sdk-0.16.1_linux-x86_64.tar.xz
+$ cd zephyr-sdk-0.16.1
+$ ./setup.sh -t riscv64-zephyr-elf -h -c
+```
 
 6. 构建Hello World示例。使用Hello World示例验证官方Zephyr项目配置是否正确，然后再继续设置自定义项目。
 
-     ```console
-     $ cd ~/zephyrproject/zephyr
-     $ west build -p auto -b tlsr9518adk80d samples/hello_world
-     ```
+```console
+$ cd ~/zephyrproject/zephyr
+$ west build -p auto -b tlsr9518adk80d samples/hello_world
+```
 
-     使用west build命令从Zephyr存储库的根目录构建hello_world示例。您可以在 `build/zephyr` 目录下找到名为 `zephyr.bin` 的固件。
+使用west build命令从Zephyr存储库的根目录构建hello_world示例。您可以在 `build/zephyr` 目录下找到名为 `zephyr.bin` 的固件。
 
 7. 将Zephyr环境脚本添加到 `~/.bashrc`。在bash中执行一下命令。
 
-     ```console
-     $ echo "source ~/zephyrproject/zephyr/zephyr-env.sh" >> ~/.bashrc
-     $ source ~/.bashrc
-     ```
+```console
+$ echo "source ~/zephyrproject/zephyr/zephyr-env.sh" >> ~/.bashrc
+$ source ~/.bashrc
+```
 
 8. 添加Telink Zephyr远程库。下载Telink repo到本地作为开发分支并更新该分支。
 
-     ```console
-     $ cd ~/zephyrproject/zephyr
-     $ git remote add telink-semi https://github.com/telink-semi/zephyr
-     $ git fetch telink develop
-     $ git checkout develop
-     $ cd ..
-     $ west update
-     $ west blobs fetch hal_telink
-     ```
+```console
+$ cd ~/zephyrproject/zephyr
+$ git remote add telink-semi https://github.com/telink-semi/zephyr
+$ git fetch telink develop
+$ git checkout develop
+$ cd ..
+$ west update
+$ west blobs fetch hal_telink
+```
 
-     更多信息参考：[Zephyr Doc -- Getting Started Guide](https://docs.zephyrproject.org/latest/getting_started/index.html)
+更多信息参考：[Zephyr Doc -- Getting Started Guide](https://docs.zephyrproject.org/latest/getting_started/index.html)
 
 ### 固件编译
 
@@ -225,38 +214,38 @@ $ sudo apt upgrade
 
 1. 无线电协处理器（ot-rcp）
 
-     ```console
-     $ cd ~/zephyrproject
-     $ rm -rf build_ot_coprocessor
-     $ west build -b tlsr9518adk80d -d build_ot_coprocessor zephyr/samples/net/openthread/coprocessor -- -DDTC_OVERLAY_FILE="usb.overlay" -DOVERLAY_CONFIG=overlay-rcp-usb-telink.conf
-     ```
+```console
+$ cd ~/zephyrproject
+$ rm -rf build_ot_coprocessor
+$ west build -b tlsr9518adk80d -d build_ot_coprocessor zephyr/samples/net/openthread/coprocessor -- -DDTC_OVERLAY_FILE="usb.overlay" -DOVERLAY_CONFIG=overlay-rcp-usb-telink.conf
+```
 
 2. 网络协处理器（ot-ncp-ftd）
 
-     打开位于 `zephyr/samples/net/openthread/coprocessor/overlay-rcp-usb-telink.conf` 文件，按如下示范进行修改。
+打开位于 `zephyr/samples/net/openthread/coprocessor/overlay-rcp-usb-telink.conf` 文件，按如下示范进行修改。
 
-     ```console
-     # Telink RCP USB-CDC-ACM
+```console
+# Telink RCP USB-CDC-ACM
 
-     CONFIG_OPENTHREAD_COPROCESSOR_NCP=y
-     CONFIG_OPENTHREAD_COPROCESSOR_RCP=n
-     ...
-     CONFIG_USB_DEVICE_PRODUCT="OpenThread CoProcessor NCP"
-     ```
+CONFIG_OPENTHREAD_COPROCESSOR_NCP=y
+CONFIG_OPENTHREAD_COPROCESSOR_RCP=n
+...
+CONFIG_USB_DEVICE_PRODUCT="OpenThread CoProcessor NCP"
+```
 
-     完成后打开位于 `zephyr/samples/net/openthread/coprocessor/boards/tlsr9518adk80d.conf` 文件，按如下示范进行修改。
+完成后打开位于 `zephyr/samples/net/openthread/coprocessor/boards/tlsr9518adk80d.conf` 文件，按如下示范进行修改。
 
-     ```console
-     CONFIG_OPENTHREAD_NUM_MESSAGE_BUFFERS=256
-     ```
+```console
+CONFIG_OPENTHREAD_NUM_MESSAGE_BUFFERS=256
+```
 
-     然后执行以下命令编译 `ot-ncp-ftd` 固件。
+然后执行以下命令编译 `ot-ncp-ftd` 固件。
 
-     ```console
-     $ cd ~/zephyrproject
-     $ rm -rf build_ot_ncp_ftd
-     $ west build -b tlsr9518adk80d -d build_ot_ncp_ftd zephyr/samples/net/openthread/coprocessor -- -DDTC_OVERLAY_FILE="usb.overlay" -DOVERLAY_CONFIG=overlay-rcp-usb-telink.conf
-     ```
+```console
+$ cd ~/zephyrproject
+$ rm -rf build_ot_ncp_ftd
+$ west build -b tlsr9518adk80d -d build_ot_ncp_ftd zephyr/samples/net/openthread/coprocessor -- -DDTC_OVERLAY_FILE="usb.overlay" -DOVERLAY_CONFIG=overlay-rcp-usb-telink.conf
+```
 
 ### 泰凌LinuxBDT设置
 
@@ -323,10 +312,10 @@ ot-rcp 的烧录方法和 ot-ncp-ftd 的基本一样，不同之处在于固件�
 
 3. 在下一步安装OTBR Docker或Pyspinel之前，先更新本地代码库和软件包管理器。
 
-     ```console
-     $ sudo apt-get update
-     $ sudp apt-get upgrade
-     ```
+```console
+$ sudo apt-get update
+$ sudp apt-get upgrade
+```
 
 ### 无线电协处理器（RCP）
 
@@ -340,29 +329,29 @@ ot-rcp固件的烧录步骤参考ot-ncp-ftd烧录过程，将B91开发板连接�
 
 1. 安装Docker：
 
-     ```console
-     $ curl -sSL https://get.docker.com | sh
-     ```
+```console
+$ curl -sSL https://get.docker.com | sh
+```
 
 2. 将当前用户添加到Docker组中，授予权限，这样在每个命令前都不需要加上`sudo`。
 
-     ```console
-     $ sudo usermod -aG docker $USER
-     ```
+```console
+$ sudo usermod -aG docker $USER
+```
 
      你需要重启树莓派来使改动生效。
 
 3. 若Docker尚未启动，请将其启动：
 
-     ```console
-     $ sudo dockerd
-     ```
+```console
+$ sudo dockerd
+```
 
 4. OTBR 防火墙脚本在 Docker 容器内创建规则。运行 modprobe 以加载 iptables 的内核模块。
 
-     ```console
-     $ sudo modprobe ip6table_filter
-     ```
+```console
+$ sudo modprobe ip6table_filter
+```
 
 #### 配置并运行Docker
 
@@ -370,79 +359,79 @@ ot-rcp固件的烧录步骤参考ot-ncp-ftd烧录过程，将B91开发板连接�
 
 1. 拉取镜像：
 
-     ```console
-     $ docker pull openthread/otbr:latest
-     ```
+```console
+$ docker pull openthread/otbr:latest
+```
 
 2. 查看Docker容器中的镜像列表：
 
-     ```console
-     $ docker images
-     REPOSITORY        TAG       IMAGE ID       CREATED      SIZE
-     openthread/otbr   latest    db081f4de15f   6 days ago   766MB
-     ```
+```console
+$ docker images
+REPOSITORY        TAG       IMAGE ID       CREATED      SIZE
+openthread/otbr   latest    db081f4de15f   6 days ago   766MB
+```
 
 3. 通过检查 `/dev` 确定RCP设备的串行端口名称, 出现 `ttyACM0` 表示RCP正确连接。
 
-     ```console
-     $ ls /dev/tty*
-     ...
-     /dev/ttyACM0
-     ... 
-     ```
+```console
+$ ls /dev/tty*
+...
+/dev/ttyACM0
+... 
+```
 
 4. 第一次运行OTBR Docker, 并引用RCP的串行端口（ttyACM0），此后若要继续使用该OTBR Docker，请使用命令 **docker start otbr**。
 
-     ```console
-     $ docker run --name "otbr" --sysctl "net.ipv6.conf.all.disable_ipv6=0 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1" -p 8080:80 --dns=127.0.0.1 -it --volume /dev/ttyACM0:/dev/ttyACM0 --privileged openthread/otbr --radio-url spinel+hdlc+uart:///dev/ttyACM0
-     ```
+```console
+$ docker run --name "otbr" --sysctl "net.ipv6.conf.all.disable_ipv6=0 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1" -p 8080:80 --dns=127.0.0.1 -it --volume /dev/ttyACM0:/dev/ttyACM0 --privileged openthread/otbr --radio-url spinel+hdlc+uart:///dev/ttyACM0
+```
 
 5. 新开一个SSH终端窗口，测试树莓派和RCP的连通性，并建立Thread网络。
 
-     ```console
-     $ docker exec -ti otbr sh -c "sudo ot-ctl"
-     > state 
-     disabled
-     Done
-     > panid 0x1022 
-     Done
-     > ifconfig up
-     Done
-     > thread start 
-     Done
-     > state 
-     detached
-     Done
-     > state 
-     leader
-     Done
-     ```
+```console
+$ docker exec -ti otbr sh -c "sudo ot-ctl"
+> state 
+disabled
+Done
+> panid 0x1022 
+Done
+> ifconfig up
+Done
+> thread start 
+Done
+> state 
+detached
+Done
+> state 
+leader
+Done
+```
 
 可选用的Docker命令：
 
 * 获取正在运行的Docker容器信息：
 
-     ```console
-     $ docker ps -aq
-     ```
+```console
+$ docker ps -aq
+```
 
 * 停止OTBR Docker：
 
-     ```console
-     $ docker stop otbr
-     ```
+```console
+$ docker stop otbr
+```
 
 * 移除OTBR Docker：
 
-     ```console
-     $ docker rm otbr
-     ```
+```console
+$ docker rm otbr
+```
 
 * 重新加载OTBR Docker：
 
-     ```console
-     $ docker restart otbr
-     ```
+```console
+$ docker restart otbr
+```
 
 ### 网络协处理器（NCP）
 
@@ -456,89 +445,89 @@ ot-rcp固件的烧录步骤参考ot-ncp-ftd烧录过程，将B91开发板连接�
 
 1. 安装依赖项：
 
-     ```console
-     $ sudo apt install python3-pip
-     $ pip3 install --user pyserial ipaddress
-     ```
+```console
+$ sudo apt install python3-pip
+$ pip3 install --user pyserial ipaddress
+```
 
 2. 下载 `pyspinel` 的源码到本地：
 
-     ```console
-     $ git clone https://github.com/openthread/pyspinel
-     ```
+```console
+$ git clone https://github.com/openthread/pyspinel
+```
 
 3. 安装Pyspinel：
 
-     ```console
-     $ cd pyspinel
-     $ sudo python3 setup.py install
-     ```
+```console
+$ cd pyspinel
+$ sudo python3 setup.py install
+```
 
 #### 验证NCP功能
 
 1. 配置NCP连接。
 
-     ```console
-     $ sudo chmod a+rw /dev/ttyACM0
-     ```
+```console
+$ sudo chmod a+rw /dev/ttyACM0
+```
 
 2. 运行Pyspinel CLI。
 
-     ```console
-     $ spinel-cli.py -u /dev/ttyACM0 -n 1
-     spinel-cli >
-     ```
+```console
+$ spinel-cli.py -u /dev/ttyACM0 -n 1
+spinel-cli >
+```
 
 3. 查询NCP版本。
 
-     ```console
-     spinel-cli > version
-     OPENTHREAD/aabbee49c; Zephyr; Aug 10 2023 14:02:37
-     Done
-     ```
+```console
+spinel-cli > version
+OPENTHREAD/aabbee49c; Zephyr; Aug 10 2023 14:02:37
+Done
+```
 
 4. 建立Thread网络。
 
-     ```console
-     spinel-cli > ifconfig up
-     Done
-     spinel-cli > thread start
-     Done
-     spinel-cli > state
-     detached
-     Done
-     spinel-cli > state
-     leader
-     Done
-     ```
+```console
+spinel-cli > ifconfig up
+Done
+spinel-cli > thread start
+Done
+spinel-cli > state
+detached
+Done
+spinel-cli > state
+leader
+Done
+```
 
-     可以看到NCP已成为leader，Thread网络被成功创建。
+可以看到NCP已成为leader，Thread网络被成功创建。
 
 可选用的spinel-cli命令：
 
 * 查看帮助菜单获取可用命令。
 
-     ```console
-     spinel-cli > help
+```console
+spinel-cli > help
 
-     Available commands (type help <name> for more information):
-     ============================================================
-     bufferinfo         extaddr       ncp-filter        releaserouterid
-     channel            extpanid      ncp-ll64          reset
-     child              h             ncp-ml64          rloc16
-     childmax           help          ncp-raw           route
-     childtimeout       history       ncp-tun           router
-     clear              ifconfig      netdata           routerdowngradethreshold
-     commissioner       ipaddr        networkidtimeout  routerselectionjitter
-     contextreusedelay  joiner        networkkey        routerupgradethreshold
-     counters           keysequence   networkname       scan
-     debug              leaderdata    panid             state
-     debug-mem          leaderweight  parent            thread
-     diag               mac           ping              txpower
-     discover           macfilter     prefix            v
-     eidcache           mfg           q                 vendor
-     exit               mode          quit              version
-     ```
+Available commands (type help <name> for more information):
+============================================================
+bufferinfo         extaddr       ncp-filter        releaserouterid
+channel            extpanid      ncp-ll64          reset
+child              h             ncp-ml64          rloc16
+childmax           help          ncp-raw           route
+childtimeout       history       ncp-tun           router
+clear              ifconfig      netdata           routerdowngradethreshold
+commissioner       ipaddr        networkidtimeout  routerselectionjitter
+contextreusedelay  joiner        networkkey        routerupgradethreshold
+counters           keysequence   networkname       scan
+debug              leaderdata    panid             state
+debug-mem          leaderweight  parent            thread
+diag               mac           ping              txpower
+discover           macfilter     prefix            v
+eidcache           mfg           q                 vendor
+exit               mode          quit              version
+```
 
 ## 总结
 
